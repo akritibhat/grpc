@@ -1,87 +1,368 @@
-gRPC - An RPC library and framework
-===================================
 
-gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. gRPC enables client and server applications to communicate transparently, and simplifies the building of connected systems.
+# Overview
 
-<table>
-  <tr>
-    <td><b>Homepage:</b></td>
-    <td><a href="https://grpc.io/">grpc.io</a></td>
-  </tr>
-  <tr>
-    <td><b>Mailing List:</b></td>
-    <td><a href="https://groups.google.com/forum/#!forum/grpc-io">grpc-io@googlegroups.com</a></td>
-  </tr>
-</table>
+This directory contains source code for PHP implementation of gRPC layered on
+shared C library. The same installation guides with more examples and
+tutorials can be seen at [grpc.io](https://grpc.io/docs/quickstart/php.html).
+gRPC PHP installation instructions for Google Cloud Platform is in
+[cloud.google.com](https://cloud.google.com/php/grpc).
 
-[![Join the chat at https://gitter.im/grpc/grpc](https://badges.gitter.im/grpc/grpc.svg)](https://gitter.im/grpc/grpc?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+## Environment
 
-# To start using gRPC
+### Prerequisites
 
-To maximize usability, gRPC supports the standard method for adding dependencies to a user's chosen language (if there is one).
-In most languages, the gRPC runtime comes as a package available in a user's language package manager.
+* `php`: version 7.0 or above (PHP 5.x support will be deprecated some time
+in 2020).
+* `pecl`
+* `composer`
+* `phpunit` (optional)
 
-For instructions on how to use the language-specific gRPC runtime for a project, please refer to these documents
 
- * [C++](src/cpp): follow the instructions under the `src/cpp` directory
- * [C#](src/csharp): NuGet package `Grpc`
- * [Dart](https://github.com/grpc/grpc-dart): pub package `grpc`
- * [Go](https://github.com/grpc/grpc-go): `go get google.golang.org/grpc`
- * [Java](https://github.com/grpc/grpc-java): Use JARs from Maven Central Repository
- * [Kotlin](https://github.com/grpc/grpc-kotlin): Use JARs from Maven Central Repository
- * [Node](https://github.com/grpc/grpc-node): `npm install grpc`
- * [Objective-C](src/objective-c): Add `gRPC-ProtoRPC` dependency to podspec
- * [PHP](src/php): `pecl install grpc`
- * [Python](src/python/grpcio): `pip install grpcio`
- * [Ruby](src/ruby): `gem install grpc`
- * [WebJS](https://github.com/grpc/grpc-web): follow the grpc-web instructions
+## Install the _grpc_ extension
 
-Per-language quickstart guides and tutorials can be found in the [documentation section on the grpc.io website](https://grpc.io/docs/). Code examples are available in the [examples](examples) directory.
+There are two ways to install the `grpc` extension.
+* `pecl`
+* Build from source
 
-Precompiled bleeding-edge package builds of gRPC `master` branch's `HEAD` are uploaded daily to [packages.grpc.io](https://packages.grpc.io).
+### Install from PECL
 
-# To start developing gRPC
+```sh
+$ [sudo] pecl install grpc
+```
 
-Contributions are welcome!
+or specific version
 
-Please read [How to contribute](CONTRIBUTING.md) which will guide you through the entire workflow of how to build the source code, how to run the tests, and how to contribute changes to
-the gRPC codebase.
-The "How to contribute" document also contains info on how the contribution process works and contains best practices for creating contributions.
+```sh
+$ [sudo] pecl install grpc-1.25.0
+```
 
-# Troubleshooting
+Note: for users on CentOS/RHEL 6, unfortunately this step won’t work. 
+Please follow the instructions below to compile the PECL extension from source.
 
-Sometimes things go wrong. Please check out the [Troubleshooting guide](TROUBLESHOOTING.md) if you are experiencing issues with gRPC.
 
-# Performance 
+### Install on Windows
 
-See the [Performance dashboard](https://performance-dot-grpc-testing.appspot.com/explore?dashboard=5652536396611584) for performance numbers of master branch daily builds.
+You can download the pre-compiled `grpc.dll` extension from the PECL
+[website](https://pecl.php.net/package/grpc).
 
-# Concepts
+### Build from source
 
-See [gRPC Concepts](CONCEPTS.md)
+Clone this repository at the [latest stable release tag](https://github.com/grpc/grpc/releases)
 
-# About This Repository
+```sh
+$ git clone -b RELEASE_TAG_HERE https://github.com/grpc/grpc
+```
 
-This repository contains source code for gRPC libraries implemented in multiple languages written on top of a shared C core library [src/core](src/core).
+#### Build and install the gRPC C core library
 
-Libraries in different languages may be in various states of development. We are seeking contributions for all of these libraries:
+```sh
+$ cd grpc
+$ git submodule update --init
+$ EXTRA_DEFINES=GRPC_POSIX_FORK_ALLOW_PTHREAD_ATFORK make
+$ [sudo] make install
+```
 
-| Language                | Source                              |
-|-------------------------|-------------------------------------|
-| Shared C [core library] | [src/core](src/core)                |
-| C++                     | [src/cpp](src/cpp)                  |
-| Ruby                    | [src/ruby](src/ruby)                |
-| Python                  | [src/python](src/python)            |
-| PHP                     | [src/php](src/php)                  |
-| C# (core library based) | [src/csharp](src/csharp)            |
-| Objective-C             | [src/objective-c](src/objective-c)  |
+#### Build and install the `grpc` extension
 
-| Language                | Source repo                                          |
-|-------------------------|------------------------------------------------------|
-| Java                    | [grpc-java](https://github.com/grpc/grpc-java)       |
-| Kotlin                  | [grpc-kotlin](https://github.com/grpc/grpc-kotlin)   |
-| Go                      | [grpc-go](https://github.com/grpc/grpc-go)           |
-| NodeJS                  | [grpc-node](https://github.com/grpc/grpc-node)       |
-| WebJS                   | [grpc-web](https://github.com/grpc/grpc-web)         |
-| Dart                    | [grpc-dart](https://github.com/grpc/grpc-dart)       |
-| .NET (pure C# impl.)    | [grpc-dotnet](https://github.com/grpc/grpc-dotnet)   |
+Compile the `grpc` extension from source
+
+```sh
+$ cd grpc/src/php/ext/grpc
+$ phpize
+$ ./configure
+$ make
+$ [sudo] make install
+```
+
+This will compile and install the `grpc` extension into the 
+standard PHP extension directory. You should be able to run 
+the [unit tests](#unit-tests), with the `grpc` extension installed.
+
+
+### Update php.ini
+
+After installing the `grpc` extension, make sure you add this line to your
+`php.ini` file, depending on where your PHP installation is, to enable the
+`grpc` extension.
+
+```sh
+extension=grpc.so
+```
+
+## Composer package
+
+In addition to the `grpc` extension, you will need to install the `grpc/grpc`
+composer package as well. Add this to your project's `composer.json` file.
+
+```
+  "require": {
+    "grpc/grpc": "v1.25.0"
+  }
+```
+
+To run tests with generated stub code from `.proto` files, you will also 
+need the `composer` and `protoc` binaries. You can find out how to get these
+below.
+
+## Protocol Buffers
+
+gRPC PHP supports
+[protocol buffers](https://developers.google.com/protocol-buffers)
+out-of-the-box. You will need the following things to get started:
+
+* `protoc`: the protobuf compiler binary to generate PHP classes for your
+messages and service definition.
+* `grpc_php_plugin`: a plugin for `protoc` to generate the service stub
+classes.
+* `protobuf.so`: the `protobuf` extension runtime library.
+
+### `protoc` compiler
+
+If you don't have it already, you need to install the protobuf compiler
+`protoc`, version 3.5.0+ (the newer the better) for the current gRPC version.
+If you installed already, make the protobuf version is compatible to the 
+grpc version you installed. If you build grpc.so from the souce, you can check
+the version of grpc inside package.xml file.
+
+The compatibility between the grpc and protobuf version is listed as table
+below:
+
+grpc | protobuf
+--- | --- 
+v1.0.0 | 3.0.0(GA)
+v1.0.1 | 3.0.2
+v1.1.0 | 3.1.0 
+v1.2.0 | 3.2.0 
+v1.2.0 | 3.2.0 
+v1.3.4 | 3.3.0 
+v1.3.5 | 3.2.0
+v1.4.0 | 3.3.0 
+v1.6.0 | 3.4.0
+v1.8.0 | 3.5.0
+v1.12.0 | 3.5.2
+v1.13.1 | 3.5.2
+v1.14.2 | 3.5.2
+v1.15.1 | 3.6.1
+v1.16.1 | 3.6.1
+v1.17.2 | 3.6.1
+v1.18.0 | 3.6.1
+v1.19.1 | 3.6.1
+v1.20.1 | 3.7.0
+v1.21.3 | 3.7.0
+v1.22.0 | 3.8.0
+v1.23.1 | 3.8.0
+v1.24.0 | 3.8.0
+v1.25.0 | 3.8.0
+
+If `protoc` hasn't been installed, you can download the `protoc` binary from
+the protocol buffers
+[Github repository](https://github.com/google/protobuf/releases).
+Then unzip this file and update the environment variable `PATH` to include the
+path to the protoc binary file.
+
+If you really must compile `protoc` from source, you can run the following
+commands, but this is risky because there is no easy way to uninstall /
+upgrade to a newer release.
+
+```sh
+$ cd grpc/third_party/protobuf
+$ ./autogen.sh && ./configure && make
+$ [sudo] make install
+```
+
+### `grpc_php_plugin` protoc plugin
+
+You need the `grpc_php_plugin` to generate the PHP client stub classes. This
+plugin works with the main `protoc` binary to generate classes that you can
+import into your project.
+
+It should already been compiled when you run `make` from the root directory
+of this repo. The plugin can be found in the `bins/opt` directory. We are
+planning to provide a better way to download and install the plugin
+in the future.
+
+You can also just build the `grpc_php_plugin` by running:
+
+```sh
+$ git clone -b RELEASE_TAG_HERE https://github.com/grpc/grpc
+$ cd grpc
+$ git submodule update --init
+$ make grpc_php_plugin
+```
+
+Plugin may use the new feature of the new protobuf version, thus please also
+make sure that the protobuf version installed is compatible with the grpc
+version you build this plugin.
+
+### `protobuf` runtime library
+
+There are two `protobuf` runtime libraries to choose from. They are identical
+in terms of APIs offered. The C implementation provides better performance, 
+while the native implementation is easier to install.
+
+#### C implementation (for better performance)
+
+Install the `protobuf` extension from PECL:
+
+``` sh
+$ [sudo] pecl install protobuf
+```
+or specific version
+
+``` sh
+$ [sudo] pecl install protobuf-3.8.0
+```
+
+And add this to your `php.ini` file:
+
+```sh
+extension=protobuf.so
+```
+
+#### PHP implementation (for easier installation)
+
+Or require the `google/protobuf` composer package. Add this to your
+`composer.json` file:
+
+```
+  "require": {
+    "google/protobuf": "^v3.8.0"
+  }
+```
+
+### Generate PHP classes from your service definition
+
+With all the above done, now you can define your message and service defintion
+in a `.proto` file and generate the corresponding PHP classes, which you can
+import into your project, with a command similar to the following:
+
+```
+$ protoc -I=. echo.proto --php_out=. --grpc_out=. \
+--plugin=protoc-gen-grpc=<path to grpc_php_plugin>
+```
+
+## Unit Tests
+
+You will need the source code to run tests
+
+```sh
+$ git clone -b RELEASE_TAG_HERE https://github.com/grpc/grpc
+$ cd grpc
+$ git submodule update --init
+```
+
+Run unit tests
+
+```sh
+$ cd grpc/src/php
+$ ./bin/run_tests.sh
+```
+
+## Generated Code Tests
+
+This section specifies the prerequisites for running the generated code tests,
+as well as how to run the tests themselves.
+
+### Composer
+
+Install the runtime dependencies via `composer install`.
+
+```sh
+$ cd grpc/src/php
+$ composer install
+```
+
+
+### Client Stub
+
+The generate client stub classes have already been generated from `.proto` files
+by the `./bin/generate_proto_php.sh` script.
+
+### Run test server
+
+Run a local server serving the math services. Please see [Node][] for how to
+run an example server.
+
+```sh
+$ cd grpc/src/php/tests/generated_code
+$ npm install
+$ node math_server.js
+```
+
+### Run test client
+
+Run the generated code tests
+
+```sh
+$ cd grpc/src/php
+$ ./bin/run_gen_code_test.sh
+```
+
+## Apache, PHP-FPM and Nginx
+
+For more information on how you can run the `grpc` library with Apache,
+PHP-FPM and Nginx, you can check out
+[this guide](https://github.com/grpc/grpc/tree/master/examples/php/echo).
+There you will find a series of Docker images where you can quickly run an
+end-to-end example.
+
+## Misc Config Options
+
+### SSL credentials
+
+Here's how you can specify SSL credentials when creating your PHP client:
+
+```
+$client = new Helloworld\GreeterClient('localhost:50051', [
+    'credentials' => Grpc\ChannelCredentials::createSsl(
+        file_get_contents('<path to certificate>'))
+]);
+```
+
+### pcntl_fork() support
+
+To make sure the `grpc` extension works with `pcntl_fork()` and related
+functions, add the following lines to your `php.ini` file:
+
+```
+grpc.enable_fork_support = 1
+grpc.poll_strategy = epoll1
+```
+
+### Tracing and Logging
+
+To turn on gRPC tracing, add the following lines to your `php.ini` file. For
+all possible values of the `grpc.grpc.trace` option, please check
+[this doc](https://github.com/grpc/grpc/blob/master/doc/environment_variables.md).
+
+```
+grpc.grpc_verbosity=debug
+grpc.grpc_trace=all,-timer_check
+grpc.log_filename=/var/log/grpc.log
+```
+
+### User agent string
+
+You can customize the user agent string for your gRPC PHP client by specifying
+this `grpc.primary_user_agent` option when constructing your PHP client:
+
+```
+$client = new Helloworld\GreeterClient('localhost:50051', [
+    'credentials' => Grpc\ChannelCredentials::createInsecure(),
+    'grpc.primary_user_agent' => 'my-user-agent-identifier',
+]);
+```
+
+### Maximum message size
+
+To change the default maximum message size, specify this
+`grpc.max_receive_message_length` option when constructing your PHP client:
+
+```
+$client = new Helloworld\GreeterClient('localhost:50051', [
+    'credentials' => Grpc\ChannelCredentials::createInsecure(),
+    'grpc.max_receive_message_length' => 8*1024*1024,
+]);
+```
+
+[Node]:https://github.com/grpc/grpc/tree/master/src/node/examples
